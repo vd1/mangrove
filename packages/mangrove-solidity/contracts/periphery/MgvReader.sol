@@ -185,12 +185,23 @@ contract MgvReader {
     } else {
       _gp = ofr_gasprice;
     }
-    return
-      (ofr_gasreq +
-        MP.local_unpack_overhead_gasbase(local) +
-        MP.local_unpack_offer_gasbase(local)) *
-      _gp *
-      10**9;
+    return _getProvision(
+      ofr_gasreq,
+      MP.local_unpack_overhead_gasbase(local),
+      MP.local_unpack_offer_gasbase(local),
+      _gp
+    );
+  }
+
+  function getOfferProvision(
+    bytes32 offer,
+    bytes32 offerDetails
+  ) returns (uint) {
+    return _getProvision(MP.offerDetails_unpack_gasreq(offer),MP.offerDetails_unpack_overhead_gasbase(details),MP.offerDetails_unpack_offer_gasbase(details),MP.offer_unpack_gasprice(offer));
+  }
+
+  function _getProvision(uint gasreq, uint overhead_gasbase, offer_gasbase, uint _gasprice) pure public returns (uint) {
+    return (gasreq + overhead_gasbase + offer_gasbase) * _gasprice * 10**9;
   }
 
   /* Returns the configuration in an ABI-compatible struct. Should not be called internally, would be a huge memory copying waste. Use `config` instead. */

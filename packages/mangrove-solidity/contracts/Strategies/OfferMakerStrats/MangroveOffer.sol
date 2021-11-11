@@ -60,7 +60,7 @@ contract MangroveOffer is AccessControlled, IMaker, TradeHandler, Exponential {
   /// NB: `Mangrove.fund` function need not be called by `this` so is not included here.
   function withdraw(address receiver, uint amount)
     external
-    onlyAdmin
+    internalOrAdmin
     returns (bool noRevert)
   {
     require(MGV.withdraw(amount));
@@ -83,6 +83,17 @@ contract MangroveOffer is AccessControlled, IMaker, TradeHandler, Exponential {
     uint gasprice, // gasprice that should be consider to compute the bounty (Mangrove's gasprice will be used if this value is lower)
     uint pivotId // identifier of an offer in the (`outbound_tkn,inbound_tkn`) Offer List after which the new offer should be inserted (gas cost of insertion will increase if the `pivotId` is far from the actual position of the new offer)
   ) external internalOrAdmin returns (uint offerId) {
+    return _newOffer(outbound_tkn,inbound_tkn,wants,gives,gasreq,gasprice,pivotId);
+  }
+
+  function _newOffer(
+    address outbound_tkn,
+    address inbound_tkn,
+    uint wants,
+    uint gives,
+    uint gasreq,
+    uint gasprice,
+    uint pivotId) internal returns (uint offerId) {
     if (gasreq == type(uint).max) {
       gasreq = OFR_GASREQ;
     }
@@ -106,7 +117,6 @@ contract MangroveOffer is AccessControlled, IMaker, TradeHandler, Exponential {
         gasprice,
         pivotId
       );
-  }
 
   //  Updates an existing `offerId` on the Mangrove. `updateOffer` rely on the same offer requirements as `newOffer` and may throw if they are not met.
   //  Additionally `updateOffer` will thow if `this` contract is not the owner of `offerId`.
