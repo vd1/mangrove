@@ -1,4 +1,4 @@
-const { ethers, env, mangrove, network } = require("hardhat");
+const { ethers, env, mangrove, network, HardhatError } = require("hardhat");
 const config = require("config");
 const { assert } = require("chai");
 const provider = ethers.provider;
@@ -604,9 +604,30 @@ async function deployMangrove() {
   const mgv_gasprice = Big(100);
   const gasmax = Big(2000000);
   const deployer = await provider.getSigner().getAddress();
-  const mgv = await Mangrove.deploy(deployer, mgv_gasprice, gasmax);
-  await mgv.deployed();
-  const receipt = await mgv.deployTransaction.wait(0);
+
+  const deployRetries = 3;
+
+  let receipt;
+  let mgv;
+  for (let index = 0; index < deployRetries; index++) {
+    mgv = await Mangrove.deploy(deployer, mgv_gasprice, gasmax);
+    try {
+      receipt = await mgv.deployTransaction.wait(0);
+
+      // if we get to here, Mangrove should have been deployed
+      break;
+    } catch (e) {
+      console.warn(e);
+      if (HardhatError.isHardhatErrorType(e) && HardhatError.number === 109) {
+        console.warn(
+          "Network timeout error from Hardhat. Retrying deployment..."
+        );
+      } else {
+        break;
+      }
+    }
+  }
+
   console.log(
     "Mangrove deployed (" + receipt.gasUsed.toString() + " gas used)"
   );
