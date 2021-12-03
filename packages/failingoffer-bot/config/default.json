@@ -1,3 +1,4 @@
 {
-  "logLevel": "verbose"
+  "logLevel": "verbose",
+  "runEveryXMinutes": 10
 }

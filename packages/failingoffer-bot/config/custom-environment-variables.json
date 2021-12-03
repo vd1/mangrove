@@ -1,3 +1,7 @@
 {
-  "logLevel": "LOG_LEVEL"
+  "logLevel": "LOG_LEVEL",
+  "runEveryXMinutes": {
+    "__name": "RUN_EVERY_X_MINUTES",
+    "__format": "number"
+  }
 }

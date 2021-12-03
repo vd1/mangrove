@@ -11,4 +11,8 @@ export class FailingOfferBot {
   constructor(mangrove: Mangrove) {
     this.#mangrove = mangrove;
   }
+
+  public async postOffers(): Promise<void> {
+    return;
+  }
 }
