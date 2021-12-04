@@ -6,7 +6,7 @@
 - Be able to run own experiments
 - Be able to create a tutorial for others
 
-## Conrete goals for today
+## Concrete goals for today
 
 - Know how to run the bot - `yarn start`
 - Change configuration - sort of achieved
